@@ -19,7 +19,7 @@ public:
 	void DrawTex(Texture& texture, glm::vec2 position, glm::vec2 size, float rotate = 0.0f, glm::vec3 colour = glm::vec3(1.0f));
 	void DrawSquare(glm::vec2 position, glm::vec2 size, float rotate = 0.0f, glm::vec3 colour = glm::vec3(1.0f));
 	void DrawLine(glm::vec2 point1, glm::vec2 point2, glm::vec3 colour, float width);
-
+	void Resize(int width, int height);
 private:
 	Shader shader;
 	unsigned int quadVAO, quadVBO, lineVAO, lineVBO;

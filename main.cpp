@@ -11,13 +11,14 @@
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void window_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
 // settings
-const unsigned int SCR_WIDTH = 1000;
-const unsigned int SCR_HEIGHT = 1000;
+const unsigned int SCR_WIDTH = 1600;
+const unsigned int SCR_HEIGHT = 900;
 
 // camera
 float lastX = (float)SCR_WIDTH / 2.0;
@@ -52,12 +53,13 @@ int main()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetWindowSizeCallback(window, window_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetKeyCallback(window, key_callback);
-
+    
     // tell GLFW to capture our mouse
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
@@ -72,7 +74,7 @@ int main()
     App app(SCR_WIDTH, SCR_HEIGHT);
 
     glfwSetWindowUserPointer(window, &app); //pointer to app object
-
+    
     // render loop
 
     while (!glfwWindowShouldClose(window))
@@ -83,6 +85,7 @@ int main()
         lastFrame = currentFrame;
 
         app.Update(deltaTime);
+        
 
         // render
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -104,10 +107,16 @@ int main()
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and 
-    // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+
+    App* app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
+    app->Resize(width, height);
 }
+
+void window_size_callback(GLFWwindow* window, int width, int height)
+{
+}
+
 
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
@@ -134,6 +143,19 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    if (key == GLFW_KEY_F && action == GLFW_RELEASE)
+    {
+        if (glfwGetWindowMonitor(window) == nullptr)
+        {
+            const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+            glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, mode->refreshRate);
+        }
+        else
+        {
+            const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+            glfwSetWindowMonitor(window, NULL, 100, 100, SCR_WIDTH, SCR_HEIGHT, mode->refreshRate);
+        }
+    }
     if (key >= 0 && key < 1024)
     {
         if (action == GLFW_PRESS)

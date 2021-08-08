@@ -29,7 +29,7 @@ public:
 	void Init();
 	void Update(float dt);
 	void Render();
-
+	void Resize(int width, int height);
 private:
 	Renderer *renderer;
 	glm::vec2 cameraOffset = glm::vec2(0.0f);

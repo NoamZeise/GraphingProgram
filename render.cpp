@@ -133,3 +133,9 @@ void Renderer::DrawLine(glm::vec2 point1, glm::vec2 point2, glm::vec3 colour, fl
 	glDrawArrays(GL_LINES, 0, 2);
 	glBindVertexArray(0);
 }
+
+void Renderer::Resize(int width, int height)
+{
+	glm::mat4 proj = glm::ortho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, -1.0f, 1.0f);
+	glUniformMatrix4fv(shader.Location("projection"), 1, GL_FALSE, &proj[0][0]);
+}

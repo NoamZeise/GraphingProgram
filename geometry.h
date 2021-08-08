@@ -30,6 +30,19 @@ public:
 	static double dot(Vector2 p1, Vector2 p2);
 };
 
+static class Math
+{
+public:
+	static inline double max(double x, double y)
+	{
+		return x > y ? x : y;
+	}
+	static inline double min(double x, double y)
+	{
+		return x < y ? x : y;
+	}
+};
+
 
 
 

@@ -16,6 +16,8 @@ public:
 	~Graph();
 	void Render(Renderer* renderer);
 	void Control(float dt, bool keys[1024]);
+	void Resize(double width, double height);
+	void Reposition(Vector2 position);
 
 private:
 	Vector2 _position;
@@ -32,6 +34,19 @@ private:
 
 	double roundUp(double number, double fixedBase);
 	double roundDown(double number, double fixedBase);
+
+	struct theme
+	{
+		glm::vec3 bgColour = glm::vec3(0.8);
+		glm::vec3 graphColour = glm::vec3(0.0);
+		float graphThickness = 3.0f;
+		glm::vec3 gridColour = glm::vec3(0.6);
+		float gridThickness = 1.0f;
+		glm::vec3 originColour = glm::vec3(0.2);
+		float originThickness = 1.5f;
+
+	};
+	theme graphTheme;
 };
 
 

@@ -9,7 +9,7 @@ App::App(unsigned int width, unsigned int height)
 	{
 		keys[i] = false;
 	}
-	graph = new Graph(glm::vec2(0.0f), glm::vec2(width, height));
+	graph = new Graph(glm::vec2(0, 0), glm::vec2(width, height));
 }
 
 App::~App()
@@ -45,6 +45,14 @@ void App::Update(float dt)
 void App::Render()
 {
 	graph->Render(renderer);
+}
+
+void App::Resize(int width, int height)
+{
+	this->Width = width;
+	this->Height = height;
+	renderer->Resize(width, height);
+	graph->Resize(width, height);
 }
 
 

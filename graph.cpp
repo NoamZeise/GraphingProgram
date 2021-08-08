@@ -4,6 +4,10 @@ Graph::Graph(glm::vec2 position, glm::vec2 size)
 {
 	_position = Vector2(position.x, position.y);
 	_size = Vector2(size.x, size.y);
+	if (_size.x > _size.y)
+		graphScale.y = (graphScale.x / _size.x) * _size.y;
+	else
+		graphScale.x = (graphScale.y / _size.y) * _size.x;
 }
 
 double Graph::roundUp(double number, double fixedBase) {
@@ -33,7 +37,8 @@ double Graph::roundDown(double number, double fixedBase) {
 
 void Graph::Render(Renderer* renderer)
 {
-	renderer->DrawSquare(glm::vec2(_position.x, _position.y), glm::vec2(_size.x, _size.y), 0.0, glm::vec3(0.8, 0.8, 0.8));
+	//draw grid background
+	renderer->DrawSquare(glm::vec2(_position.x, _position.y), glm::vec2(_size.x, _size.y), 0.0, graphTheme.bgColour);
 
 	DrawGrid(renderer);
 	
@@ -44,49 +49,45 @@ void Graph::Render(Renderer* renderer)
 		if (x < graphPos.x)
 			break;
 		Vector2 thisPos(x, sin(x) * 1.0);
-		renderer->DrawLine(fromGraphToScreen(lastPos), fromGraphToScreen(thisPos), glm::vec3(0.0), 3.0);
+		renderer->DrawLine(fromGraphToScreen(lastPos), fromGraphToScreen(thisPos), graphTheme.graphColour, graphTheme.graphThickness);
 		lastPos = thisPos;
 	}
-	
-
 }
 
 void Graph::DrawGrid(Renderer* renderer)
 {
 	int xSize(1), ySize(1);
-
-	if (graphScale.x > 5)
-		xSize = (int)log10(graphScale.x / 3);
-	else
-		xSize = (int)log10(graphScale.x / 3) - 1;
-	if (graphScale.y > 5)
-		ySize = (int)log10(graphScale.y / 3);
-	else
-		ySize = (int)log10(graphScale.y / 3) - 1;
-
-	double size = pow(10.0, (double)xSize);
-	double limit = roundUp(graphPos.x, size) - graphPos.x;
-	double flr = roundDown(graphPos.x, size);
-	double tempX = graphPos.x - flr;
-	double maxX = tempX + graphScale.x;
-
-	for (double x = limit; x < maxX; x += size)
+	double scale = Math::max(graphScale.x, graphScale.y);
+	if (scale > 5)
 	{
-		verticalLine(renderer, (x + graphPos.x), glm::vec3(0.6), 1.0);
+		xSize = (int)log10(scale / 3);
+		ySize = (int)log10(scale / 3);
 	}
-	verticalLine(renderer, 0, glm::vec3(0.2), 1.5);
-	
-	size = pow(10.0, (double)ySize);
-	limit = roundUp(graphPos.y, size) - graphPos.y;
-	flr = roundDown(graphPos.y, size);
-	double tempY = graphPos.y - flr;
-	double maxY = tempY + graphScale.y;
-	for (double y = limit; y < maxY; y += size)
+	else
 	{
-		horizontalLine(renderer, (y + graphPos.y), glm::vec3(0.6), 1.0);
+		xSize = (int)log10(scale / 3) - 1;
+		ySize = (int)log10(scale / 3) - 1;
 	}
+
+	//draw vertical grid lines
+	double interval = pow(10.0, (double)xSize);
+	double min = roundUp(graphPos.x, interval) - graphPos.x;
+	double max = (graphPos.x - roundDown(graphPos.x, interval)) + graphScale.x + interval;
+	for (double x = min; x < max; x += interval)
+	{
+		verticalLine(renderer, (x + graphPos.x),graphTheme.gridColour, graphTheme.gridThickness);
+	}
+	verticalLine(renderer, 0, graphTheme.originColour, graphTheme.originThickness);
 	
-	horizontalLine(renderer, 0, glm::vec3(0.2), 1.5);
+	//draw horizontal grid lines
+	interval = pow(10.0, (double)ySize);
+	min = roundUp(graphPos.y, interval) - graphPos.y;
+	max = (graphPos.y - roundDown(graphPos.y, interval)) + graphScale.y + interval;
+	for (double y = min; y < max; y += interval)
+	{
+		horizontalLine(renderer, (y + graphPos.y), graphTheme.gridColour, graphTheme.gridThickness);
+	}
+	horizontalLine(renderer, 0, graphTheme.originColour, graphTheme.originThickness);
 }
 
 void Graph::Control(float dt, bool keys[1024])
@@ -147,13 +148,35 @@ glm::vec2 Graph::fromGraphToScreen(Vector2 p)
 
 void Graph::horizontalLine(Renderer* renderer, double yPos, glm::vec3 colour, float width)
 {
-	yPos = fromGraphToScreen(Vector2(0.0f, yPos)).y;
-	renderer->DrawLine(glm::vec2(_position.x, yPos), glm::vec2(_position.x + _size.x, yPos) , colour, width);
+	if (yPos > graphPos.y && yPos < graphPos.y + graphScale.y)
+	{
+		yPos = fromGraphToScreen(Vector2(0.0f, yPos)).y;
+		renderer->DrawLine(glm::vec2(_position.x, yPos), glm::vec2(_position.x + _size.x, yPos), colour, width);
+	}
 }
 
 
 void Graph::verticalLine(Renderer* renderer, double xPos, glm::vec3 colour, float width)
 {
-	xPos = fromGraphToScreen(Vector2(xPos, 0)).x;
-	renderer->DrawLine(glm::vec2(xPos, _position.y), glm::vec2(xPos, _position.y + _size.y), colour, width);
+	if (xPos > graphPos.x && xPos < graphPos.x + graphScale.x)
+	{
+		xPos = fromGraphToScreen(Vector2(xPos, 0)).x;
+		renderer->DrawLine(glm::vec2(xPos, _position.y), glm::vec2(xPos, _position.y + _size.y), colour, width);
+	}
+}
+
+
+void Graph::Resize(double width, double height)
+{
+	_size = Vector2(width, height);
+	if (_size.x > _size.y)
+		graphScale.y = (graphScale.x / _size.x) * _size.y;
+	else
+		graphScale.x = (graphScale.y / _size.y) * _size.x;
+
+}
+
+void Graph::Reposition(Vector2 position)
+{
+	_position = Vector2(position.x, position.y);
 }
