@@ -38,3 +38,5 @@ x64/Debug/stb_image.obj
 x64/Debug/texture.obj
 x64/Debug/vc142.idb
 x64/Debug/vc142.pdb
+x64/Debug/graphic.obj
+x64/Debug/tinyfiledialogs.obj
