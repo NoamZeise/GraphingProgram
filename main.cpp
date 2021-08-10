@@ -11,16 +11,15 @@
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void window_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
 // settings
 const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 900;
 
-// camera
 float lastX = (float)SCR_WIDTH / 2.0;
 float lastY = (float)SCR_HEIGHT / 2.0;
 bool firstMouse = true;
@@ -53,13 +52,13 @@ int main()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetWindowSizeCallback(window, window_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetKeyCallback(window, key_callback);
-    
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
     // tell GLFW to capture our mouse
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
@@ -108,15 +107,12 @@ int main()
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
-
-    App* app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
-    app->Resize(width, height);
+    if (width != 0 && height != 0)
+    {
+        App* app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
+        app->Resize(width, height);
+    }
 }
-
-void window_size_callback(GLFWwindow* window, int width, int height)
-{
-}
-
 
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
@@ -134,13 +130,16 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
     lastX = xpos;
     lastY = ypos;
+
+    App* app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
+    app->mousePos = Vector2(lastX, lastY);
+
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
     //get app object in order to handle input
     App* app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
-
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (key == GLFW_KEY_F && action == GLFW_RELEASE)
@@ -173,6 +172,24 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
+    App* app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
+    app->Scroll(yoffset);
+}
 
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    App* app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
+
+    if (button >= 0 && button < 8)
+    {
+        if (action == GLFW_PRESS)
+        {
+            app->buttons[button] = true;
+        }
+        else if (action == GLFW_RELEASE)
+        {
+            app->buttons[button] = false;
+        }
+    }
 }
 

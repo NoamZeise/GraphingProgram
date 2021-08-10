@@ -57,6 +57,7 @@ unsigned int Shader::compileShader(const char* path, bool isFragmentShader)
 	//load shader source file into string
 	std::ifstream in(path);
 	std::string shaderSource((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+	in.close();
 	const char* source = shaderSource.c_str();
 	glShaderSource(shader, 1, &source, NULL);
 

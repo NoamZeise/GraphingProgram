@@ -8,30 +8,11 @@ Graph::Graph(glm::vec2 position, glm::vec2 size)
 		graphScale.y = (graphScale.x / _size.x) * _size.y;
 	else
 		graphScale.x = (graphScale.y / _size.y) * _size.x;
-}
 
-double Graph::roundUp(double number, double fixedBase) {
-	if (fixedBase != 0 && number != 0) {
-		double sign = number > 0 ? 1 : -1;
-		number *= sign;
-		number /= fixedBase;
-		double fixedPoint = ceil(number);
-		number = fixedPoint * fixedBase;
-		number *= sign;
-	}
-	return number;
-}
-
-double Graph::roundDown(double number, double fixedBase) {
-	if (fixedBase != 0 && number != 0) {
-		double sign = number > 0 ? 1 : -1;
-		number *= sign;
-		number /= fixedBase;
-		double fixedPoint = floor(number);
-		number = fixedPoint * fixedBase;
-		number *= sign;
-	}
-	return number;
+	std::vector<Vector2> vects = { Vector2(0, 0), Vector2(0.5, 1.0), Vector2(1.0, 2.0) };
+	//graphics.push_back(new Plot(vects));
+	//graphics.push_back(new Function({ 0, 0, 1 }));
+	graphics.push_back(new Function({ 0, 0, 0, -0.5 }));
 }
 
 
@@ -41,16 +22,38 @@ void Graph::Render(Renderer* renderer)
 	renderer->DrawSquare(glm::vec2(_position.x, _position.y), glm::vec2(_size.x, _size.y), 0.0, graphTheme.bgColour);
 
 	DrawGrid(renderer);
+
+	for (unsigned int i = 0; i < graphics.size(); i++)
+		DrawGraphic(renderer, graphics[i]);
 	
-	Vector2 lastPos(graphPos.x, sin(graphPos.x) * 1.0);
-	double step = (double)graphScale.x / 100.0;
-	for (double x = graphPos.x; x < (double)graphPos.x + (double)graphScale.x; x+= step)
+}
+
+void Graph::DrawGraphic(Renderer* renderer, Graphic* graphic)
+{
+	Plot* plot = dynamic_cast<Plot*>(graphic);
+
+	if (plot == nullptr)
 	{
-		if (x < graphPos.x)
-			break;
-		Vector2 thisPos(x, sin(x) * 1.0);
-		renderer->DrawLine(fromGraphToScreen(lastPos), fromGraphToScreen(thisPos), graphTheme.graphColour, graphTheme.graphThickness);
-		lastPos = thisPos;
+		Vector2 lastPos(graphPos.x, graphic->plot(graphPos.x));
+		double step = (double)graphScale.x / 100.0;
+		for (double x = graphPos.x; x <= graphPos.x + (graphScale.x * 1.0001); x += step)
+		{
+			if (x < graphPos.x)
+				break;
+			Vector2 thisPos(x, graphic->plot(x));
+			renderer->DrawLine(fromGraphToScreen(lastPos), fromGraphToScreen(thisPos), graphTheme.graphColour, graphTheme.graphThickness);
+			lastPos = thisPos;
+		}
+	}
+	else
+	{
+		std::vector<Vector2>* vects = plot->getData();
+
+		for (unsigned int i = 1; i < vects->size(); i++)
+		{
+			if(crossesScreen(vects->at(i - 1), vects->at(i)))
+				renderer->DrawLine(fromGraphToScreen(vects->at(i - 1)), fromGraphToScreen(vects->at(i)), graphTheme.graphColour, graphTheme.graphThickness);
+		}
 	}
 }
 
@@ -92,7 +95,7 @@ void Graph::DrawGrid(Renderer* renderer)
 
 void Graph::Control(float dt, bool keys[1024])
 {
-	double speed = 1.0;
+	double speed = 0.5;
 	if (keys[GLFW_KEY_W])
 	{
 		graphPos.y += (double)dt * speed * graphScale.y;
@@ -126,6 +129,29 @@ void Graph::Control(float dt, bool keys[1024])
 
 }
 
+double Graph::roundUp(double number, double fixedBase) {
+	if (fixedBase != 0 && number != 0) {
+		double sign = number > 0 ? 1 : -1;
+		number *= sign;
+		number /= fixedBase;
+		double fixedPoint = ceil(number);
+		number = fixedPoint * fixedBase;
+		number *= sign;
+	}
+	return number;
+}
+
+double Graph::roundDown(double number, double fixedBase) {
+	if (fixedBase != 0 && number != 0) {
+		double sign = number > 0 ? 1 : -1;
+		number *= sign;
+		number /= fixedBase;
+		double fixedPoint = floor(number);
+		number = fixedPoint * fixedBase;
+		number *= sign;
+	}
+	return number;
+}
 
 glm::vec2 Graph::fromGraphToScreen(Vector2 p)
 {
@@ -145,6 +171,24 @@ glm::vec2 Graph::fromGraphToScreen(Vector2 p)
 	return glm::vec2(p.x, p.y);
 }
 
+bool Graph::withinScreen(Vector2 p)
+{
+	return (p.x > _position.x && p.x < _position.x + _size.x) && (p.y > _position.y && p.y < _position.y + _size.y);
+}
+bool Graph::crossesScreen(Vector2 p1, Vector2 p2)
+{
+	if (withinScreen(p1) || withinScreen(p2))
+		return true;
+	if (p1.x < _position.x && p2.x < _position.x)
+		return false;
+	if (p1.x > _position.x + _size.x && p2.x > _position.x + _size.x)
+		return false;
+	if (p1.y < _position.y && p2.y < _position.y)
+		return false;
+	if (p1.y > _position.y + _size.y && p2.y > _position.y + _size.y)
+		return false;
+	return true;
+}
 
 void Graph::horizontalLine(Renderer* renderer, double yPos, glm::vec3 colour, float width)
 {
@@ -179,4 +223,40 @@ void Graph::Resize(double width, double height)
 void Graph::Reposition(Vector2 position)
 {
 	_position = Vector2(position.x, position.y);
+}
+
+void Graph::AddGraphic(Graphic* graphic)
+{
+	graphics.push_back(graphic);
+}
+
+void Graph::RemoveGraphic(Graphic* graphic)
+{
+	for (unsigned int i = 0; i < graphics.size() ; i++)
+	{
+		if (graphics[i] == graphic)
+		{
+			graphics.erase(graphics.begin() + i);
+			break;
+		}
+	}
+}
+
+void Graph::Zoom(double offset)
+{
+	double speed = 0.1;
+	if (offset < 0)
+	{
+		graphScale.x +=  speed * graphScale.x;
+		graphPos.x -=  speed * graphScale.x * 0.5f;
+		graphScale.y += speed * graphScale.y;
+		graphPos.y -= speed * graphScale.y * 0.5f;
+	}
+	if (offset > 0)
+	{
+		graphScale.x -= speed * graphScale.x;
+		graphPos.x += speed * graphScale.x * 0.5f;
+		graphScale.y -= speed * graphScale.y;
+		graphPos.y += speed * graphScale.y * 0.5f;
+	}
 }

@@ -11,16 +11,23 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
+#include <string>
+#include <filesystem>
 
 #include "render.h"
 #include "shader.h"
 #include "graph.h"
 #include "texture.h"
+#include "csv.h"
+
+#include "tinyfiledialogs.h"
 
 class App
 {
 public:
 	bool keys[1024];
+	bool buttons[8];
+	Vector2 mousePos;
 	unsigned int Width, Height;
 
 	App(unsigned int width, unsigned int height);
@@ -30,10 +37,10 @@ public:
 	void Update(float dt);
 	void Render();
 	void Resize(int width, int height);
+	void Scroll(double offset);
 private:
 	Renderer *renderer;
 	glm::vec2 cameraOffset = glm::vec2(0.0f);
-
 	Graph* graph;
 };
 
