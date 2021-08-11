@@ -5,9 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-class Vector2
+struct Vector2
 {
-public:
 	double x;
 	double y;
 	Vector2()
@@ -19,6 +18,16 @@ public:
 	{
 		this->x = x;
 		this->y = y;
+	}
+
+	bool operator==(Vector2 p2)
+	{
+		return (x == p2.x) && (y == p2.y);
+	}
+
+	Vector2 operator+(Vector2 p2)
+	{
+		return Vector2(x + p2.x, y + p2.y);
 	}
 
 };

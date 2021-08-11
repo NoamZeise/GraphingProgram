@@ -29,7 +29,7 @@ private:
 	Vector2 _position;
 	Vector2 _size;
 	Vector2 graphPos = Vector2(0.0, 0.0);
-	Vector2 graphScale = Vector2(5, 5);
+	Vector2 graphScale = Vector2(100, 100);
 
 	std::vector<Graphic*> graphics;
 
@@ -50,14 +50,15 @@ private:
 		glm::vec3 bgColour = glm::vec3(0.8);
 		glm::vec3 graphColour = glm::vec3(0.0, 0.0, 0.0);
 		float graphThickness = 3.0f;
+		glm::vec3 pointColour = glm::vec3(0.0, 0.0, 0.0);
+		float pointThickness = 4.0f;
 		glm::vec3 gridColour = glm::vec3(0.6);
 		float gridThickness = 1.0f;
 		glm::vec3 originColour = glm::vec3(0.2);
 		float originThickness = 1.5f;
-
+		glm::vec3 textColour = glm::vec3(0.0, 0.0, 0.0);
 	};
 	theme graphTheme;
 };
-
 
 #endif

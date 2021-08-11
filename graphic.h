@@ -43,7 +43,21 @@ public:
 
 	Plot(std::vector<Vector2> data)
 	{
-		_data = data;
+		_fullData = data;
+		for (int i = 0; i < _fullData.size(); i++)
+		{
+			bool found = false;
+			for (int j = 0; j < _data.size(); j++)
+			{
+				if (_data.at(j) == _fullData.at(i))
+				{
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+				_data.push_back(_fullData.at(i));
+		}
 	}
 	std::vector<Vector2>* getData()
 	{
@@ -51,6 +65,7 @@ public:
 	}
 private:
 	std::vector<Vector2> _data;
+	std::vector<Vector2> _fullData;
 };
 
 

@@ -9,10 +9,7 @@ Graph::Graph(glm::vec2 position, glm::vec2 size)
 	else
 		graphScale.x = (graphScale.y / _size.y) * _size.x;
 
-	std::vector<Vector2> vects = { Vector2(0, 0), Vector2(0.5, 1.0), Vector2(1.0, 2.0) };
-	//graphics.push_back(new Plot(vects));
-	//graphics.push_back(new Function({ 0, 0, 1 }));
-	graphics.push_back(new Function({ 0, 0, 0, -0.5 }));
+	//graphics.push_back(new Function({ 0, 0, 0, -0.5 }));
 }
 
 
@@ -49,10 +46,10 @@ void Graph::DrawGraphic(Renderer* renderer, Graphic* graphic)
 	{
 		std::vector<Vector2>* vects = plot->getData();
 
-		for (unsigned int i = 1; i < vects->size(); i++)
+		for (unsigned int i = 0; i < vects->size(); i++)
 		{
-			if(crossesScreen(vects->at(i - 1), vects->at(i)))
-				renderer->DrawLine(fromGraphToScreen(vects->at(i - 1)), fromGraphToScreen(vects->at(i)), graphTheme.graphColour, graphTheme.graphThickness);
+			if(withinScreen(vects->at(i)))
+				renderer->DrawPoint(fromGraphToScreen(vects->at(i)), graphTheme.graphColour, graphTheme.pointThickness);
 		}
 	}
 }
@@ -91,6 +88,12 @@ void Graph::DrawGrid(Renderer* renderer)
 		horizontalLine(renderer, (y + graphPos.y), graphTheme.gridColour, graphTheme.gridThickness);
 	}
 	horizontalLine(renderer, 0, graphTheme.originColour, graphTheme.originThickness);
+
+	renderer->DrawString("x:" + std::to_string(graphPos.x)
+		+ "  y:" + std::to_string(graphPos.y)
+		+ "  interval:1e" + std::to_string(xSize),
+		glm::vec2(10, _size.y - 10), 15, 0, graphTheme.textColour);
+
 }
 
 void Graph::Control(float dt, bool keys[1024])
@@ -173,19 +176,23 @@ glm::vec2 Graph::fromGraphToScreen(Vector2 p)
 
 bool Graph::withinScreen(Vector2 p)
 {
-	return (p.x > _position.x && p.x < _position.x + _size.x) && (p.y > _position.y && p.y < _position.y + _size.y);
+	return !(
+		p.x < graphPos.x ||
+		p.x > graphPos.x + graphScale.x ||
+		p.y < graphPos.y ||
+		p.y > graphPos.y + graphScale.y);
 }
 bool Graph::crossesScreen(Vector2 p1, Vector2 p2)
 {
 	if (withinScreen(p1) || withinScreen(p2))
 		return true;
-	if (p1.x < _position.x && p2.x < _position.x)
+	if (p1.x < graphPos.x && p2.x < graphPos.x)
 		return false;
-	if (p1.x > _position.x + _size.x && p2.x > _position.x + _size.x)
+	if (p1.x > graphPos.x + graphScale.x && p2.x > graphPos.x + graphScale.x)
 		return false;
-	if (p1.y < _position.y && p2.y < _position.y)
+	if (p1.y < graphPos.y && p2.y < graphScale.y)
 		return false;
-	if (p1.y > _position.y + _size.y && p2.y > _position.y + _size.y)
+	if (p1.y > graphPos.y + graphScale.y && p2.y > graphPos.y + graphScale.y)
 		return false;
 	return true;
 }
@@ -195,7 +202,10 @@ void Graph::horizontalLine(Renderer* renderer, double yPos, glm::vec3 colour, fl
 	if (yPos > graphPos.y && yPos < graphPos.y + graphScale.y)
 	{
 		yPos = fromGraphToScreen(Vector2(0.0f, yPos)).y;
-		renderer->DrawLine(glm::vec2(_position.x, yPos), glm::vec2(_position.x + _size.x, yPos), colour, width);
+		renderer->DrawLine(
+			glm::vec2(_position.x, yPos),
+			glm::vec2(_position.x + _size.x, yPos),
+			colour, width);
 	}
 }
 
@@ -205,7 +215,10 @@ void Graph::verticalLine(Renderer* renderer, double xPos, glm::vec3 colour, floa
 	if (xPos > graphPos.x && xPos < graphPos.x + graphScale.x)
 	{
 		xPos = fromGraphToScreen(Vector2(xPos, 0)).x;
-		renderer->DrawLine(glm::vec2(xPos, _position.y), glm::vec2(xPos, _position.y + _size.y), colour, width);
+		renderer->DrawLine(
+			glm::vec2(xPos, _position.y),
+			glm::vec2(xPos, _position.y + _size.y),
+			colour, width);
 	}
 }
 

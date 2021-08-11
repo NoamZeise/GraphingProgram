@@ -1,9 +1,24 @@
 #include "render.h"
 
-Renderer::Renderer(Shader &shader)
+Renderer::Renderer(int width, int height)
 {
-	this->shader = shader;
+	Shader textureShader("shaders/sprite.vs", "shaders/sprite.fs");
+
+	textureShader.Use();
+
+	//configure sprite shader
+	glm::mat4 proj = glm::ortho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, -1.0f, 1.0f);
+	glm::mat4 view = glm::mat4(1.0f);
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, 0.0f));
+
+	glUniform1i(textureShader.Location("image"), 0);
+	glUniformMatrix4fv(textureShader.Location("projection"), 1, GL_FALSE, &proj[0][0]);
+	glUniformMatrix4fv(textureShader.Location("view"), 1, GL_FALSE, &view[0][0]);
+
+	this->_textureShader = textureShader;
+
 	initRenderData();
+	initFontData();
 }
 
 Renderer::~Renderer()
@@ -57,9 +72,14 @@ void Renderer::initRenderData()
 	glBindVertexArray(0);
 }
 
+void Renderer::initFontData()
+{
+	CourierNew = new Font("c:/windows/fonts/arial.ttf");
+}
+
 void Renderer::DrawTex(Texture& texture, glm::vec2 position, glm::vec2 size, float rotate, glm::vec3 colour)
 {
-	shader.Use();
+	_textureShader.Use();
 	glm::mat4 model = glm::mat4(1.0f);  
 
 	model = glm::translate(model, glm::vec3(position, 0.0f)); //translate object by position
@@ -71,9 +91,10 @@ void Renderer::DrawTex(Texture& texture, glm::vec2 position, glm::vec2 size, flo
 
 	model = glm::scale(model, glm::vec3(size, 1.0f)); //then scale
 
-	glUniformMatrix4fv(shader.Location("model"), 1, GL_FALSE, &model[0][0]);
-	glUniform3fv(shader.Location("spriteColour"), 1, &colour[0]);
-	glUniform1i(shader.Location("enableTexture"), GL_TRUE);
+	glUniformMatrix4fv(_textureShader.Location("model"), 1, GL_FALSE, &model[0][0]);
+	glUniform3fv(_textureShader.Location("spriteColour"), 1, &colour[0]);
+	glUniform1i(_textureShader.Location("enableTexture"), GL_TRUE);
+	glUniform1i(_textureShader.Location("enableFont"), GL_FALSE);
 	glActiveTexture(GL_TEXTURE0);
 	texture.Bind();
 
@@ -82,9 +103,10 @@ void Renderer::DrawTex(Texture& texture, glm::vec2 position, glm::vec2 size, flo
 	glBindVertexArray(0);
 }
 
+
 void Renderer::DrawSquare(glm::vec2 position, glm::vec2 size, float rotate, glm::vec3 colour)
 {
-	shader.Use();
+	_textureShader.Use();
 	glm::mat4 model = glm::mat4(1.0f);
 
 	model = glm::translate(model, glm::vec3(position, 0.0f)); //translate object by position
@@ -96,18 +118,65 @@ void Renderer::DrawSquare(glm::vec2 position, glm::vec2 size, float rotate, glm:
 
 	model = glm::scale(model, glm::vec3(size, 1.0f)); //then scale
 
-	glUniformMatrix4fv(shader.Location("model"), 1, GL_FALSE, &model[0][0]);
-	glUniform3fv(shader.Location("spriteColour"), 1, &colour[0]);
-	glUniform1i(shader.Location("enableTexture"), GL_FALSE);
+	glUniformMatrix4fv(_textureShader.Location("model"), 1, GL_FALSE, &model[0][0]);
+	glUniform3fv(_textureShader.Location("spriteColour"), 1, &colour[0]);
+	glUniform1i(_textureShader.Location("enableTexture"), GL_FALSE);
+	glUniform1i(_textureShader.Location("enableFont"), GL_FALSE);
 
 	glBindVertexArray(quadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 }
 
+void Renderer::DrawString(std::string text, glm::vec2 position, float size, float rotate, glm::vec3 colour)
+{
+	_textureShader.Use();
+	glUniform3fv(_textureShader.Location("spriteColour"), 1, &colour[0]);
+	glUniform1i(_textureShader.Location("enableTexture"), GL_FALSE);
+	glUniform1i(_textureShader.Location("enableFont"), GL_TRUE);
+	glActiveTexture(GL_TEXTURE0);
+	std::string::const_iterator c;
+	for (c = text.begin(); c != text.end(); c++)
+	{
+		Character* cTex = CourierNew->getChar(*c);
+		if (cTex == nullptr)
+		{
+			continue;
+		}
+		glm::vec2 thisPos = position;
+		thisPos.x += cTex->Bearing.x * size;
+		thisPos.y += (cTex->Size.y - cTex->Bearing.y) * size;
+		thisPos.y -= cTex->Size.y * size;
+		glm::vec2 dim = glm::vec2(cTex->Size.x * size, cTex->Size.y * size);
+		dim.x /= 1;
+		dim.y /= 1;
+		glm::mat4 model = glm::mat4(1.0f);
+
+		model = glm::translate(model, glm::vec3(thisPos, 0.0f)); //translate object by position
+
+		//model = glm::translate(model, glm::vec3(0.5 * dim.x, 0.5 * dim.y, 0.0)); // move object by half its size, so rotates around centre
+		//model = glm::rotate(model, glm::radians(rotate), glm::vec3(0.0, 0.0, 1.0));//then do rotation
+		//model = glm::translate(model, glm::vec3(-0.5 * dim.x, -0.5 * dim.y, 0.0)); //then translate back to original position
+
+		model = glm::scale(model, glm::vec3(dim, 1.0f)); //then scale
+
+
+		glUniformMatrix4fv(_textureShader.Location("model"), 1, GL_FALSE, &model[0][0]);
+		glBindTexture(GL_TEXTURE_2D, cTex->TextureID);
+
+		glBindVertexArray(quadVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
+
+		position.x += cTex->Advance * size;
+	}
+	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void Renderer::DrawLine(glm::vec2 point1, glm::vec2 point2, glm::vec3 colour, float width)
 {
-	shader.Use();
+	_textureShader.Use();
 	glLineWidth(width);
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(point1, 0.0f));
@@ -126,16 +195,34 @@ void Renderer::DrawLine(glm::vec2 point1, glm::vec2 point2, glm::vec3 colour, fl
 	
 	model = glm::scale(model, glm::vec3(glm::vec2(scale), 1.0f)); //then scale
 
-	glUniformMatrix4fv(shader.Location("model"), 1, GL_FALSE, &model[0][0]);
-	glUniform3fv(shader.Location("spriteColour"), 1, &colour[0]);
-	glUniform1i(shader.Location("enableTexture"), GL_FALSE);
+	glUniformMatrix4fv(_textureShader.Location("model"), 1, GL_FALSE, &model[0][0]);
+	glUniform3fv(_textureShader.Location("spriteColour"), 1, &colour[0]);
+	glUniform1i(_textureShader.Location("enableTexture"), GL_FALSE);
+	glUniform1i(_textureShader.Location("enableFont"), GL_FALSE);
 	glBindVertexArray(lineVAO);
 	glDrawArrays(GL_LINES, 0, 2);
+	glBindVertexArray(0);
+}
+
+void Renderer::DrawPoint(glm::vec2 point, glm::vec3 colour, float size)
+{
+	_textureShader.Use();
+	glPointSize(size);
+
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(point, 0.0f));
+
+	glUniformMatrix4fv(_textureShader.Location("model"), 1, GL_FALSE, &model[0][0]);
+	glUniform3fv(_textureShader.Location("spriteColour"), 1, &colour[0]);
+	glUniform1i(_textureShader.Location("enableTexture"), GL_FALSE);
+	glUniform1i(_textureShader.Location("enableFont"), GL_FALSE);
+	glBindVertexArray(lineVAO);
+	glDrawArrays(GL_POINTS, 0, 1);
 	glBindVertexArray(0);
 }
 
 void Renderer::Resize(int width, int height)
 {
 	glm::mat4 proj = glm::ortho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, -1.0f, 1.0f);
-	glUniformMatrix4fv(shader.Location("projection"), 1, GL_FALSE, &proj[0][0]);
+	glUniformMatrix4fv(_textureShader.Location("projection"), 1, GL_FALSE, &proj[0][0]);
 }

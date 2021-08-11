@@ -44,21 +44,15 @@ public:
 					{
 						if (line[i] == ',')
 						{
-							if(value != "")
 								data.push_back(value);
-							else
-								data.push_back("0");
-							value = "";
+								value = "";
 						}
 						else
 						{
 							value += line[i];
 						}
 					}
-					if (value != "")
 						data.push_back(value);
-					else
-						data.push_back("0");
 				}
 			}
 			file.close();
@@ -66,26 +60,40 @@ public:
 
 	}
 
-	std::vector<Vector2> get2Col()
+	std::vector<Vector2> get2Col(int col1, int col2)
 	{
-		int getColls[] { 1, 2 };
+		if (col1 > col2)
+		{
+			int temp = col1;
+			col1 = col2;
+			col2 = temp;
+		}
 		std::vector<Vector2> colData;
 		int collumn = 1;
 		int row = 1;
+		bool invalidP = false;
 		Vector2 p(0, 0);
 		for (int i = 0; i < data.size(); i++)
 		{
-			if (collumn == getColls[0])
+			if (collumn == col1)
 			{
-				p.x = std::stod(data.at(i));
+				if (data.at(i) != "")
+					p.x = std::stod(data.at(i));
+				else
+					invalidP = true;
 			}
-			if (collumn == getColls[1])
+			if (collumn == col2)
 			{
 				//std::cout << data.at(i) << std::endl;
 				//std::cout << data.size() << std::endl;
 				//std::cout << i << std::endl;
-				p.y = std::stod(data.at(i));
-				colData.push_back(p);
+				if (data.at(i) != "" && !invalidP)
+				{
+					p.y = std::stod(data.at(i));
+					colData.push_back(p);
+				}
+				else
+					invalidP = false;
 				row++;
 				if (row >= rows)
 					break;
