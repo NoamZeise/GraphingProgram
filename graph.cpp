@@ -51,13 +51,22 @@ void Graph::DrawGraphic(Renderer* renderer, Graphic* graphic)
 	}
 	else
 	{
+		/*
 		std::vector<Vector2>* vects = plot->getData();
-
 		for (unsigned int i = 0; i < vects->size(); i++)
 		{
 			if(withinScreen(vects->at(i)))
 				renderer->DrawPoint(fromGraphToScreen(vects->at(i)), graphTheme.graphColour, graphTheme.pointThickness);
 		}
+		*/
+		
+		renderer->DrawVertexPoints(plot->getVertexData(),
+			glm::vec2(graphPos.x, graphPos.y),
+			glm::vec2(graphScale.x, graphScale.y),
+			glm::vec2(_position.x, _position.y),
+			glm::vec2(_size.x, _size.y),
+			graphTheme.pointColour,
+			graphTheme.pointThickness);
 	}
 }
 

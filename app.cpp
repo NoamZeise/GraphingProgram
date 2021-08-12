@@ -22,6 +22,10 @@ App::~App()
 	renderer = nullptr;
 	delete graph;
 	graph = nullptr;
+	for (unsigned int i = 0; i < openCsvs.size(); i++)
+	{
+		delete openCsvs.at(i);
+	}
 }
 
 void App::Init()
@@ -48,8 +52,8 @@ void App::Update(float dt)
 
 		if (selection)
 		{
-			Csv file(selection);
-			graph->AddGraphic(new Plot(file.get2Col(1, 2)));
+			openCsvs.push_back(new Csv(selection));
+			graph->AddGraphic(new Plot(openCsvs.at(openCsvs.size() - 1)->get2Col(1, 2)));
 		}
 		dialogOpened = true;
 	}

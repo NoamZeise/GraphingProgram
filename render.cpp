@@ -2,18 +2,22 @@
 
 Renderer::Renderer(int width, int height)
 {
-	_textureShader = new Shader("shaders/sprite.vs", "shaders/sprite.fs");
 
-	_textureShader->Use();
-
-	//configure sprite shader
 	glm::mat4 proj = glm::ortho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, -1.0f, 1.0f);
 	glm::mat4 view = glm::mat4(1.0f);
 	view = glm::translate(view, glm::vec3(0.0f, 0.0f, 0.0f));
 
+	_textureShader = new Shader("shaders/sprite.vs", "shaders/sprite.fs");
+	_textureShader->Use();
 	glUniform1i(_textureShader->Location("image"), 0);
 	glUniformMatrix4fv(_textureShader->Location("projection"), 1, GL_FALSE, &proj[0][0]);
 	glUniformMatrix4fv(_textureShader->Location("view"), 1, GL_FALSE, &view[0][0]);
+
+
+	_pointShader = new Shader("shaders/point.vs", "shaders/point.fs");
+	_pointShader->Use();
+	glUniformMatrix4fv(_pointShader->Location("projection"), 1, GL_FALSE, &proj[0][0]);
+	glUniformMatrix4fv(_pointShader->Location("view"), 1, GL_FALSE, &view[0][0]);
 
 	initRenderData();
 	initFontData();
@@ -22,6 +26,7 @@ Renderer::Renderer(int width, int height)
 Renderer::~Renderer()
 {
 	delete _textureShader;
+	delete _pointShader;
 	delete CourierNew;
 	delete _line;
 	delete _quad;
@@ -145,6 +150,8 @@ void Renderer::DrawLine(glm::vec2 point1, glm::vec2 point2, glm::vec3 colour, fl
 	_line->Draw(GL_LINES);
 }
 
+
+
 void Renderer::DrawPoint(glm::vec2 point, glm::vec3 colour, float size)
 {
 	_textureShader->Use();
@@ -161,10 +168,27 @@ void Renderer::DrawPoint(glm::vec2 point, glm::vec3 colour, float size)
 	_line->Draw(GL_POINTS, 1);
 }
 
+void Renderer::DrawVertexPoints(VertexData* vd, glm::vec2 gPosition, glm::vec2 gScale, glm::vec2 vPosition, glm::vec2 vScale, glm::vec3 colour, float size)
+{
+	_pointShader->Use();
+	glPointSize(size);
+
+	glUniform2fv(_pointShader->Location("gPos"), 1, &gPosition[0]);
+	glUniform2fv(_pointShader->Location("gScale"), 1, &gScale[0]);
+	glUniform2fv(_pointShader->Location("vPos"), 1, &vPosition[0]);
+	glUniform2fv(_pointShader->Location("vScale"), 1, &vScale[0]);
+	glUniform3fv(_pointShader->Location("spriteColour"), 1, &colour[0]);
+
+	vd->Draw(GL_POINTS);
+}
+
 void Renderer::Resize(int width, int height)
 {
 	glm::mat4 proj = glm::ortho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, -1.0f, 1.0f);
+	_textureShader->Use();
 	glUniformMatrix4fv(_textureShader->Location("projection"), 1, GL_FALSE, &proj[0][0]);
+	_pointShader->Use();
+	glUniformMatrix4fv(_pointShader->Location("projection"), 1, GL_FALSE, &proj[0][0]);
 }
 
 glm::mat4 Renderer::getModel(glm::vec2 position, glm::vec2 size, float rotate)

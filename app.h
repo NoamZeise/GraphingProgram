@@ -34,9 +34,10 @@ public:
 private:
 	unsigned int Width, Height;
 	glm::vec2 mousePos = glm::vec2(0);
-	Renderer *renderer;
+	Renderer* renderer;
 	glm::vec2 cameraOffset = glm::vec2(0.0f);
 	Graph* graph;
+	std::vector<Csv*> openCsvs;
 	bool dialogOpened = false;
 	bool keys[1024];
 	bool buttons[8];

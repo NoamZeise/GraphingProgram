@@ -26,9 +26,11 @@ public:
 	void DrawSquare(glm::vec2 position, glm::vec2 size, float rotate = 0.0f, glm::vec3 colour = glm::vec3(1.0f));
 	void DrawLine(glm::vec2 point1, glm::vec2 point2, glm::vec3 colour, float width);
 	void DrawPoint(glm::vec2 point, glm::vec3 colour, float size);
+	void DrawVertexPoints(VertexData* vd, glm::vec2 gPosition, glm::vec2 gScale, glm::vec2 vPosition, glm::vec2 vScale, glm::vec3 colour, float size);
 	void Resize(int width, int height);
 private:
 	Shader* _textureShader;
+	Shader* _pointShader;
 	Font* CourierNew;
 	VertexData* _quad;
 	VertexData* _line;
