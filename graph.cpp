@@ -90,7 +90,7 @@ void Graph::DrawGraphic(Renderer* renderer, Graphic* graphic, int num)
 	//draw labels
 	renderer->DrawString(
 		graphic->xLabel,
-		glm::vec2(_size.x / 2 + (num * (_size.x / 25)), _size.y - _size.x / 200),
+		glm::vec2(_size.x / 2 + (num * (_size.x / 15)), _size.y - _size.x / 200),
 		_size.x / 100,
 		0,
 		graphTheme.graphColour);
