@@ -2,6 +2,7 @@
 
 Csv::Csv(const char* filename)
 {
+	datasetName = filename;
 	std::ifstream file(filename);
 	if (file.is_open())
 	{
@@ -48,47 +49,68 @@ Csv::Csv(const char* filename)
 		}
 		file.close();
 	}
-
 }
-
-std::vector<Vector2> Csv::get2Col(int col1, int col2)
+std::vector<Vector2> Csv::get2Col(int xCol, int yCol)
 {
-	if (col1 > col2)
-	{
-		int temp = col1;
-		col1 = col2;
-		col2 = temp;
-	}
+
 	std::vector<Vector2> colData;
-	int collumn = 1;
-	int row = 1;
+
+	if (xCol >= collumns || yCol >= collumns)
+		return colData;
+
+	//check for non-numeric collumns
+	for (int i = 0; i < collumns; i++)
+	{
+		try { std::stod(data.at(i)); }
+		catch(...)
+		{
+			if (i == xCol || i == yCol)
+				return colData;
+		}
+	}
+
+	int collumn = 0;
+	int row = 0;
 	bool invalidP = false;
 	Vector2 p(0, 0);
 	for (int i = 0; i < data.size(); i++)
 	{
-		if (collumn == col1)
+		if (collumn == xCol)
 		{
 			if (data.at(i) != "")
 				p.x = std::stod(data.at(i));
+			else 
+				invalidP = true;
+		}
+		if (collumn == yCol)
+		{
+			if (data.at(i) != "")
+				p.y = std::stod(data.at(i));
 			else
 				invalidP = true;
 		}
-		if (collumn == col2)
+		collumn++;
+		if (collumn >= collumns)
 		{
-			if (data.at(i) != "" && !invalidP)
-			{
-				p.y = std::stod(data.at(i));
-				colData.push_back(p);
-			}
-			else
-				invalidP = false;
 			row++;
 			if (row >= rows)
 				break;
-		}
-		collumn++;
-		if (collumn >= collumns)
 			collumn = 0;
+			if (!invalidP)
+				colData.push_back(p);
+		}
 	}
 	return colData;
+}
+
+std::string Csv::getColLabel(int col)
+{
+	if(col < titles.size())
+		return titles[col];
+	return std::to_string(col);
+}
+
+std::string Csv::getName()
+{
+	return datasetName;
 }

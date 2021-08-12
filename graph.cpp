@@ -28,16 +28,42 @@ void Graph::Render(Renderer* renderer)
 	DrawGrid(renderer);
 
 	for (unsigned int i = 0; i < graphics.size(); i++)
-		DrawGraphic(renderer, graphics[i]);
+		DrawGraphic(renderer, graphics[i], i);
 	
 }
 
-void Graph::DrawGraphic(Renderer* renderer, Graphic* graphic)
+void Graph::DrawGraphic(Renderer* renderer, Graphic* graphic, int num)
 {
 	Plot* plot = dynamic_cast<Plot*>(graphic);
 
+	switch (num)
+	{
+	case 1:
+		graphTheme.graphColour = glm::vec3(0.5f, 0.0f,0.0f);
+		break;
+	case 2:
+		graphTheme.graphColour = glm::vec3(0.0f, 0.5f, 0.0f);
+		break;
+	case 3:
+		graphTheme.graphColour = glm::vec3(0.0f, 0.0f, 0.5f);
+		break;
+	case 4:
+		graphTheme.graphColour = glm::vec3(0.5f, 0.5f, 0.0f);
+		break;
+	case 5:
+		graphTheme.graphColour = glm::vec3(0.5f, 0.0f, 0.5f);
+		break;
+	case 6:
+		graphTheme.graphColour = glm::vec3(0.0f, 0.5f, 0.5f);
+		break;
+	default:
+		graphTheme.graphColour = glm::vec3(0.0f);
+		break;
+	}
+
 	if (plot == nullptr)
 	{
+		//plot data line
 		Vector2 lastPos(graphPos.x, graphic->plot(graphPos.x));
 		double step = (double)graphScale.x / 100.0;
 		for (double x = graphPos.x; x <= graphPos.x + (graphScale.x * 1.0001); x += step)
@@ -51,23 +77,30 @@ void Graph::DrawGraphic(Renderer* renderer, Graphic* graphic)
 	}
 	else
 	{
-		/*
-		std::vector<Vector2>* vects = plot->getData();
-		for (unsigned int i = 0; i < vects->size(); i++)
-		{
-			if(withinScreen(vects->at(i)))
-				renderer->DrawPoint(fromGraphToScreen(vects->at(i)), graphTheme.graphColour, graphTheme.pointThickness);
-		}
-		*/
-		
+		//plot data points
 		renderer->DrawVertexPoints(plot->getVertexData(),
 			glm::vec2(graphPos.x, graphPos.y),
 			glm::vec2(graphScale.x, graphScale.y),
 			glm::vec2(_position.x, _position.y),
 			glm::vec2(_size.x, _size.y),
-			graphTheme.pointColour,
+			graphTheme.graphColour,
 			graphTheme.pointThickness);
 	}
+
+	//draw labels
+	renderer->DrawString(
+		graphic->xLabel,
+		glm::vec2(_size.x / 2 + (num * (_size.x / 25)), _size.y - _size.x / 200),
+		_size.x / 100,
+		0,
+		graphTheme.graphColour);
+
+	renderer->DrawString(
+		graphic->yLabel,
+		glm::vec2(_size.x / 200, _size.y / 2 + (num * (_size.y / 30))),
+		_size.x / 100,
+		0,
+		graphTheme.graphColour);
 }
 
 void Graph::DrawGrid(Renderer* renderer)
@@ -226,7 +259,6 @@ void Graph::horizontalLine(Renderer* renderer, double yPos, glm::vec3 colour, fl
 	}
 }
 
-
 void Graph::verticalLine(Renderer* renderer, double xPos, glm::vec3 colour, float width)
 {
 	if (xPos > graphPos.x && xPos < graphPos.x + graphScale.x)
@@ -238,7 +270,6 @@ void Graph::verticalLine(Renderer* renderer, double xPos, glm::vec3 colour, floa
 			colour, width);
 	}
 }
-
 
 void Graph::Resize(double width, double height)
 {

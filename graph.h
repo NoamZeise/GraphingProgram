@@ -41,7 +41,7 @@ private:
 	void horizontalLine(Renderer* renderer, double yPos, glm::vec3 colour, float width);
 	void verticalLine(Renderer* renderer, double xPos, glm::vec3 colour, float width);
 	void DrawGrid(Renderer* renderer);
-	void DrawGraphic(Renderer* renderer, Graphic* graphic);
+	void DrawGraphic(Renderer* renderer, Graphic* graphic, int num);
 
 	double roundUp(double number, double fixedBase);
 	double roundDown(double number, double fixedBase);
@@ -51,7 +51,6 @@ private:
 		glm::vec3 bgColour = glm::vec3(0.8);
 		glm::vec3 graphColour = glm::vec3(0.0, 0.0, 0.0);
 		float graphThickness = 3.0f;
-		glm::vec3 pointColour = glm::vec3(0.0, 0.0, 0.0);
 		float pointThickness = 4.0f;
 		glm::vec3 gridColour = glm::vec3(0.6);
 		float gridThickness = 1.0f;

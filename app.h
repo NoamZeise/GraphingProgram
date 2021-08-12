@@ -13,8 +13,10 @@
 #include "render.h"
 #include "graph.h"
 #include "csv.h"
+#include "menu.h"
 
 #include "tinyfiledialogs.h"
+
 
 class App
 {
@@ -30,6 +32,7 @@ public:
 	void ProcessKeyboard(int key, bool pressed);
 	void ProcessMouseBtn(int key, bool pressed);
 	void ProcessMouse(double xPos, double yPos);
+	bool ShouldClose();
 
 private:
 	unsigned int Width, Height;
@@ -41,6 +44,19 @@ private:
 	bool dialogOpened = false;
 	bool keys[1024];
 	bool buttons[8];
+	bool shouldClose = false;
+
+	Menu* topMenu;
+	struct menuButtons
+	{
+		std::string importCsv = "Import CSV";
+		std::string addFunction = "Polynomial";
+		std::string exit = "Exit";
+	};
+	menuButtons btnNames;
+
+
+	void MenuControls();
 };
 
 

@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <vector>
+#include <string>
 
 #include "geometry.h"
 #include "vertex_data.h"
@@ -13,7 +14,8 @@ class Graphic
 {
 public:
 	virtual double plot(double x) = 0;
-	
+	std::string xLabel = "x";
+	std::string yLabel = "y";
 protected:
 
 private:
@@ -43,7 +45,7 @@ class Plot : public Graphic
 public:
 	double plot(double x) override;
 
-	Plot(std::vector<Vector2> data);
+	Plot(std::vector<Vector2> data, std::string xLabel, std::string yLabel);
 
 	~Plot()
 	{

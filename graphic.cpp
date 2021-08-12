@@ -27,8 +27,10 @@ Function::Function(std::vector<double> quadratic)
 }
 
 
-Plot::Plot(std::vector<Vector2> data)
+Plot::Plot(std::vector<Vector2> data, std::string xLabel, std::string yLabel)
 {
+	this->xLabel = xLabel;
+	this->yLabel = yLabel;
 	_fullData = data;
 	for (int i = 0; i < _fullData.size(); i++)
 	{

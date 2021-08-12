@@ -82,6 +82,9 @@ int main()
         lastFrame = currentFrame;
 
         app.Update(deltaTime);
+
+        if(app.ShouldClose())
+            glfwSetWindowShouldClose(window, true);
         
         // render
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -122,8 +125,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
     //get app object in order to handle input
     App* app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
     if (key == GLFW_KEY_F && action == GLFW_RELEASE)
     {
         if (glfwGetWindowMonitor(window) == nullptr)

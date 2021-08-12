@@ -12,10 +12,13 @@ class Csv
 {
 public:
 	Csv(const char* filename);
-	std::vector<Vector2> get2Col(int col1, int col2);
+	std::vector<Vector2> get2Col(int xCol, int yCol);
+	std::string getColLabel(int col);
+	std::string getName();
 private:
 	int collumns = 0;
 	int rows = 0;
+	std::string datasetName;
 	std::vector<std::string> titles;
 	std::vector<std::string> data;
 };
