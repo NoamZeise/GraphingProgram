@@ -1,10 +1,5 @@
 #include "shader.h"
 
-Shader::Shader()
-{
-
-}
-
 Shader::Shader(const char* VertexShaderPath, const char* FragmentShaderPath)
 {
 	//create shader

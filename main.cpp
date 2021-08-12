@@ -20,10 +20,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 900;
 
-float lastX = (float)SCR_WIDTH / 2.0;
-float lastY = (float)SCR_HEIGHT / 2.0;
-bool firstMouse = true;
-
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -87,7 +83,6 @@ int main()
 
         app.Update(deltaTime);
         
-
         // render
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -98,7 +93,6 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
 
     glfwTerminate();
     return 0;
@@ -120,22 +114,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-    if (firstMouse)
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-    lastX = xpos;
-    lastY = ypos;
-
     App* app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
-    app->mousePos = Vector2(lastX, lastY);
-
+    app->ProcessMouse(xpos, ypos);
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
@@ -161,11 +141,11 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     {
         if (action == GLFW_PRESS)
         {
-            app->keys[key] = true;
+            app->ProcessKeyboard(key, true);
         }
         else if (action == GLFW_RELEASE)
         {
-            app->keys[key] = false;
+            app->ProcessKeyboard(key, false);
         }
     }
 }
@@ -186,11 +166,11 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     {
         if (action == GLFW_PRESS)
         {
-            app->buttons[button] = true;
+            app->ProcessMouseBtn(button, true);
         }
         else if (action == GLFW_RELEASE)
         {
-            app->buttons[button] = false;
+            app->ProcessMouseBtn(button, false);
         }
     }
 }

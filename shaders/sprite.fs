@@ -13,8 +13,8 @@ void main()
         colour = vec4(spriteColour, 1.0) * texture(image, TexCoords);
     else if(enableFont)
         {
-           vec4 sampled = vec4(1.0, 1.0, 1.0, texture(image, TexCoords).r);
-          colour = vec4(spriteColour, 1.0) * sampled;
+            vec4 sampled = vec4(1.0, 1.0, 1.0, texture(image, TexCoords).r);
+           colour = vec4(spriteColour, 1.0) * sampled;
         }
     else
         colour = vec4(spriteColour, 1.0);

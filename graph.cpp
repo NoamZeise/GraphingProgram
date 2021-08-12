@@ -8,8 +8,15 @@ Graph::Graph(glm::vec2 position, glm::vec2 size)
 		graphScale.y = (graphScale.x / _size.x) * _size.y;
 	else
 		graphScale.x = (graphScale.y / _size.y) * _size.x;
+}
 
-	//graphics.push_back(new Function({ 0, 0, 0, -0.5 }));
+
+Graph::~Graph()
+{
+	for (unsigned int i = 0; i < graphics.size(); i++)
+	{
+		delete graphics[i];
+	}
 }
 
 
@@ -89,10 +96,11 @@ void Graph::DrawGrid(Renderer* renderer)
 	}
 	horizontalLine(renderer, 0, graphTheme.originColour, graphTheme.originThickness);
 
+	//text
 	renderer->DrawString("x:" + std::to_string(graphPos.x)
 		+ "  y:" + std::to_string(graphPos.y)
 		+ "  interval:1e" + std::to_string(xSize),
-		glm::vec2(10, _size.y - 10), 15, 0, graphTheme.textColour);
+		glm::vec2(_size.x / 200, _size.y - _size.x / 200), _size.x / 100, 0, graphTheme.textColour);
 
 }
 

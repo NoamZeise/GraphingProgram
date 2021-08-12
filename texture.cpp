@@ -1,9 +1,5 @@
 #include "texture.h"
 
-#include <glad/glad.h>
-#include <iostream>
-#include "stb_image.h"
-
 Texture::Texture(const char* path)
 {
 	Wrap_S = GL_REPEAT;

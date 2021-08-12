@@ -18,7 +18,10 @@ App::App(unsigned int width, unsigned int height)
 
 App::~App()
 {
-	
+	delete renderer;
+	renderer = nullptr;
+	delete graph;
+	graph = nullptr;
 }
 
 void App::Init()
@@ -31,7 +34,7 @@ void App::Update(float dt)
 {
 	graph->Control(dt, keys);
 
-	if (keys[GLFW_KEY_F1])
+	if (keys[GLFW_KEY_F1] && !dialogOpened)
 	{
 		char const* lFilterPatterns[1] = { "*.csv" };
 		char const* selection = tinyfd_openFileDialog( // there is also a wchar_t version
@@ -48,10 +51,15 @@ void App::Update(float dt)
 			Csv file(selection);
 			graph->AddGraphic(new Plot(file.get2Col(1, 2)));
 		}
+		dialogOpened = true;
+	}
+	else if (keys[GLFW_KEY_F2] && !dialogOpened)
+	{
+		
+
+		dialogOpened = true;
 	}
 }
-
-
 
 
 void App::Render()
@@ -70,6 +78,23 @@ void App::Resize(int width, int height)
 void App::Scroll(double offset)
 {
 	graph->Zoom(offset);
+}
+
+void App::ProcessKeyboard(int key, bool pressed)
+{
+	keys[key] = pressed;
+	dialogOpened = false;
+}
+void App::ProcessMouseBtn(int button, bool pressed)
+{
+	buttons[button] = pressed;
+	dialogOpened = false;
+}
+void App::ProcessMouse(double xPos, double yPos)
+{
+	mousePos.x = xPos;
+	mousePos.y = yPos;
+	dialogOpened = false;
 }
 
 

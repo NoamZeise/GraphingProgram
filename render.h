@@ -2,10 +2,14 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "vertex_data.h"
 #include "shader.h"
 #include "texture.h"
 #include "geometry.h"
@@ -24,11 +28,13 @@ public:
 	void DrawPoint(glm::vec2 point, glm::vec3 colour, float size);
 	void Resize(int width, int height);
 private:
-	Shader _textureShader;
+	Shader* _textureShader;
 	Font* CourierNew;
-	unsigned int quadVAO, quadVBO, lineVAO, lineVBO;
+	VertexData* _quad;
+	VertexData* _line;
 	void initRenderData();
 	void initFontData();
+	glm::mat4 getModel(glm::vec2 position, glm::vec2 size, float rotate);
 };
 
 #endif

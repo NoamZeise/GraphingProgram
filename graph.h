@@ -17,6 +17,7 @@ class Graph
 {
 public:
 	Graph(glm::vec2 position, glm::vec2 size);
+	~Graph();
 	void Render(Renderer* renderer);
 	void Control(float dt, bool keys[1024]);
 	void Resize(double width, double height);

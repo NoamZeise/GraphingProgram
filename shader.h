@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -16,7 +17,6 @@
 class Shader
 {
 public:
-	Shader();
 	Shader(const char* VertexShaderPath, const char* FragmentShaderPath);
 	~Shader();
 	void Use();

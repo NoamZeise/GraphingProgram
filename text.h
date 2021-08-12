@@ -23,6 +23,10 @@ struct Character
 		this->Bearing = Bearing;
 		this->Advance = Advance;
 	}
+	~Character()
+	{
+		glDeleteTextures(1, &TextureID);
+	}
 	unsigned int TextureID;
 	glm::vec2 Size;
 	glm::vec2 Bearing;
@@ -33,6 +37,7 @@ class Font
 {
 public:
 	Font(const char* file);
+	~Font();
 	Character* getChar(char c);
 private:
 	std::map<char, Character*> _chars;

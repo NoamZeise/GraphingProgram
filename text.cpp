@@ -28,6 +28,15 @@ Font::Font(const char* file)
 	FT_Done_FreeType(ftlib);
 }
 
+Font::~Font()
+{
+	std::map<char, Character*>::iterator it;
+	for (it = _chars.begin(); it != _chars.end(); it++)
+	{
+		delete it->second;
+	}
+}
+
 bool Font::loadCharacter(FT_Face face, char c)
 {
 	if (FT_Load_Char(face, c, FT_LOAD_RENDER))
