@@ -1,29 +1,33 @@
 #include "button.h"
 
 
-Button::Button(glm::vec2 pos, glm::vec2 size, std::string text)
+Button::Button(Vector2 pos, Vector2 size, std::string text) : Base(pos, size)
 {
-	_pos = pos;
-	_size = size;
-	_text = text;
+	this->text = text;
 }
 
 void Button::Render(Renderer* renderer)
 {
-	renderer->DrawSquare(_pos, _size, 0, glm::vec3(0.0f));
+	renderer->DrawSquare(glm::vec2(_Position.x, _Position.y), glm::vec2(_Size.x, _Size.y), 0, glm::vec3(0.0f));
 
 	if(hover)
-		renderer->DrawSquare(_pos, glm::vec2(_size.x * 0.98f, _size.y * 0.9f), 0, glm::vec3(0.7f));
+		renderer->DrawSquare(glm::vec2(_Position.x, _Position.y), glm::vec2(_Size.x * 0.98f, _Size.y * 0.9f), 0, glm::vec3(0.7f));
 	else
-		renderer->DrawSquare(_pos, glm::vec2(_size.x * 0.98f, _size.y * 0.9f), 0, glm::vec3(1.0f));
+		renderer->DrawSquare(glm::vec2(_Position.x, _Position.y), glm::vec2(_Size.x * 0.98f, _Size.y * 0.9f), 0, glm::vec3(1.0f));
 
-	renderer->DrawString(_text, glm::vec2(_pos.x + _size.y * 0.3f, _pos.y + _size.y - _size.y * 0.3f), _size.y * 0.8f, 0, glm::vec3(0.0f));
+	renderer->DrawString(text,
+		glm::vec2(_Position.x + _Size.y * 0.3f,
+			_Position.y + _Size.y - _Size.y * 0.3f),
+		_Size.y * 0.8f, 0, glm::vec3(0.0f));
 }
 
-void Button::Mouse(double xPos, double yPos, bool clicked)
+void Button::Update(double xPos, double yPos, bool clicked)
 {
 	hover =
-		(xPos > _pos.x && xPos < (double)_pos.x + (double)_size.x && yPos > _pos.y && yPos < (double)_pos.y + (double)_size.y);
+		(xPos >= _Position.x &&
+			xPos <= (double)_Position.x + (double)_Size.x &&
+			yPos >= _Position.y &&
+			yPos <= (double)_Position.y + (double)_Size.y);
 
 	if (clicked && !justPressed && hover && unclickedHover)
 	{
@@ -39,11 +43,10 @@ void Button::Mouse(double xPos, double yPos, bool clicked)
 		unclickedHover = false;
 }
 
-bool Button::pressed()
+bool Button::Pressed()
 {
 	if (justPressed)
 	{
-		hover = false;
 		unclickedHover = false;
 		justPressed = false;
 		return true;
@@ -51,10 +54,8 @@ bool Button::pressed()
 	return justPressed;
 }
 
-
-void Button::Resize(glm::vec2 pos, glm::vec2 size)
+bool Button::Hovering()
 {
-	this->_pos = pos;
-	this->_size = size;
+	return hover;
 }
 

@@ -112,5 +112,7 @@ std::string Csv::getColLabel(int col)
 
 std::string Csv::getName()
 {
-	return datasetName;
+	std::string name = datasetName;
+	name = name.substr(name.find_last_of('\\') + 1);
+	return name;
 }

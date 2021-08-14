@@ -45,3 +45,6 @@ x64/Debug/vertex_data.obj
 x64/Debug/csv.obj
 x64/Debug/button.obj
 x64/Debug/menu.obj
+x64/Debug/dropMenu.obj
+x64/Debug/options.obj
+x64/Debug/uiManager.obj

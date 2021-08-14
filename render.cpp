@@ -55,7 +55,7 @@ void Renderer::initRenderData()
 
 void Renderer::initFontData()
 {
-	CourierNew = new Font("c:/windows/fonts/arial.ttf");
+	CourierNew = new Font("fonts/Roboto-Regular.ttf");
 }
 
 void Renderer::DrawTex(Texture& texture, glm::vec2 position, glm::vec2 size, float rotate, glm::vec3 colour)

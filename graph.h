@@ -11,20 +11,20 @@
 #include "render.h"
 #include "geometry.h"
 #include "graphic.h"
-
+#include "input.h"
 
 class Graph
 {
 public:
-	Graph(glm::vec2 position, glm::vec2 size);
+	Graph(Vector2 position, Vector2 size);
 	~Graph();
 	void Render(Renderer* renderer);
-	void Control(float dt, bool keys[1024]);
+	void Control(float dt, Input* input);
 	void Resize(double width, double height);
 	void Reposition(Vector2 position);
 	void AddGraphic(Graphic* graphic);
 	void RemoveGraphic(Graphic* graphic);
-	void Zoom(double offset);
+
 
 private:
 	Vector2 _position;

@@ -12,10 +12,9 @@
 
 #include "render.h"
 #include "graph.h"
-#include "csv.h"
-#include "menu.h"
+#include "ui_manager.h"
+#include "input.h"
 
-#include "tinyfiledialogs.h"
 
 
 class App
@@ -36,27 +35,12 @@ public:
 
 private:
 	unsigned int Width, Height;
-	glm::vec2 mousePos = glm::vec2(0);
 	Renderer* renderer;
 	glm::vec2 cameraOffset = glm::vec2(0.0f);
 	Graph* graph;
-	std::vector<Csv*> openCsvs;
-	bool dialogOpened = false;
-	bool keys[1024];
-	bool buttons[8];
 	bool shouldClose = false;
-
-	Menu* topMenu;
-	struct menuButtons
-	{
-		std::string importCsv = "Import CSV";
-		std::string addFunction = "Polynomial";
-		std::string exit = "Exit";
-	};
-	menuButtons btnNames;
-
-
-	void MenuControls();
+	UIManager* uiManager;
+	Input input;
 };
 
 

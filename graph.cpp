@@ -1,9 +1,9 @@
 #include "graph.h"
 
-Graph::Graph(glm::vec2 position, glm::vec2 size)
+Graph::Graph(Vector2 position, Vector2 size)
 {
-	_position = Vector2(position.x, position.y);
-	_size = Vector2(size.x, size.y);
+	this->_position = position;
+	this->_size = size;
 	if (_size.x > _size.y)
 		graphScale.y = (graphScale.x / _size.x) * _size.y;
 	else
@@ -13,10 +13,6 @@ Graph::Graph(glm::vec2 position, glm::vec2 size)
 
 Graph::~Graph()
 {
-	for (unsigned int i = 0; i < graphics.size(); i++)
-	{
-		delete graphics[i];
-	}
 }
 
 
@@ -146,33 +142,50 @@ void Graph::DrawGrid(Renderer* renderer)
 
 }
 
-void Graph::Control(float dt, bool keys[1024])
+void Graph::Control(float dt, Input* input)
 {
 	double speed = 0.5;
-	if (keys[GLFW_KEY_W])
+	if (input->Keys[GLFW_KEY_W])
 	{
 		graphPos.y += (double)dt * speed * graphScale.y;
 	}
-	if (keys[GLFW_KEY_A])
+	if (input->Keys[GLFW_KEY_A])
 	{
 		graphPos.x -= (double)dt * speed * graphScale.x;
 	}
-	if (keys[GLFW_KEY_S])
+	if (input->Keys[GLFW_KEY_S])
 	{
 		graphPos.y -= (double)dt * speed * graphScale.y;
 	}
-	if (keys[GLFW_KEY_D])
+	if (input->Keys[GLFW_KEY_D])
 	{
 		graphPos.x += (double)dt * speed * graphScale.x;
 	}
-	if (keys[GLFW_KEY_MINUS])
+	if (input->Keys[GLFW_KEY_MINUS])
 	{
 		graphScale.x += (double)dt * speed * graphScale.x;
 		graphPos.x -= (double)dt * speed * graphScale.x * 0.5f;
 		graphScale.y += (double)dt * speed * graphScale.y;
 		graphPos.y -= (double)dt * speed * graphScale.y * 0.5f;
 	}
-	if (keys[GLFW_KEY_EQUAL])
+	if (input->Keys[GLFW_KEY_EQUAL])
+	{
+		graphScale.x -= (double)dt * speed * graphScale.x;
+		graphPos.x += (double)dt * speed * graphScale.x * 0.5f;
+		graphScale.y -= (double)dt * speed * graphScale.y;
+		graphPos.y += (double)dt * speed * graphScale.y * 0.5f;
+	}
+
+	//scroll
+	speed = 10.0;
+	if (input->offset < 0)
+	{
+		graphScale.x += (double)dt * speed * graphScale.x;
+		graphPos.x -= (double)dt * speed * graphScale.x * 0.5f;
+		graphScale.y += (double)dt * speed * graphScale.y;
+		graphPos.y -= (double)dt * speed * graphScale.y * 0.5f;
+	}
+	if (input->offset > 0)
 	{
 		graphScale.x -= (double)dt * speed * graphScale.x;
 		graphPos.x += (double)dt * speed * graphScale.x * 0.5f;
@@ -300,24 +313,5 @@ void Graph::RemoveGraphic(Graphic* graphic)
 			graphics.erase(graphics.begin() + i);
 			break;
 		}
-	}
-}
-
-void Graph::Zoom(double offset)
-{
-	double speed = 0.1;
-	if (offset < 0)
-	{
-		graphScale.x +=  speed * graphScale.x;
-		graphPos.x -=  speed * graphScale.x * 0.5f;
-		graphScale.y += speed * graphScale.y;
-		graphPos.y -= speed * graphScale.y * 0.5f;
-	}
-	if (offset > 0)
-	{
-		graphScale.x -= speed * graphScale.x;
-		graphPos.x += speed * graphScale.x * 0.5f;
-		graphScale.y -= speed * graphScale.y;
-		graphPos.y += speed * graphScale.y * 0.5f;
 	}
 }

@@ -15,6 +15,7 @@ public:
 	std::vector<Vector2> get2Col(int xCol, int yCol);
 	std::string getColLabel(int col);
 	std::string getName();
+	int getCollNum() { return collumns; };
 private:
 	int collumns = 0;
 	int rows = 0;
