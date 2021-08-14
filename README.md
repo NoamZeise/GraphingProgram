@@ -1,6 +1,6 @@
 # GraphingProgram
 
-This is a simple application which can display an equation or a series of points to the user on a grid.
+A graphical application which can display an equation or a series of points to the user on a grid.
 The user can zoom and move the graph around using the keyboard.
 
 ## features
