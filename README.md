@@ -12,6 +12,8 @@ The user can zoom and move the graph around using the keyboard.
 
 ## tools used
 * OpenGL for rendering 
+* freetype2 for ttf loading
+* stb_image for image loading
 * tinyfilesdialog for file selection
 
 
