@@ -31,7 +31,7 @@ public:
 private:
 	Shader* _textureShader;
 	Shader* _pointShader;
-	Font* CourierNew;
+	Font* Roboto;
 	VertexData* _quad;
 	VertexData* _line;
 	void initRenderData();

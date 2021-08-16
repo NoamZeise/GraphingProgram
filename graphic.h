@@ -10,6 +10,8 @@
 #include "geometry.h"
 #include "vertex_data.h"
 
+typedef double (*graphicFunc)(double);
+
 class Graphic
 {
 public:
@@ -22,10 +24,11 @@ private:
 
 };
 
-enum FunctionType
+enum class FunctionType
 {
 	None,
-	Quadratic,
+	Polynomial,
+	PassedFunc,
 	Sinusoidal
 };
 
@@ -33,10 +36,13 @@ class Function : public Graphic
 {
 public:
 	double plot(double x) override;
-	
-	Function(std::vector<double> quadratic);
+
+	Function(std::vector<double> polynomial);
+	Function(graphicFunc func);
+
 private:
 	FunctionType _type = FunctionType::None;
+	graphicFunc func = nullptr;
 	std::vector<double> _data;
 };
 

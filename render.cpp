@@ -27,7 +27,7 @@ Renderer::~Renderer()
 {
 	delete _textureShader;
 	delete _pointShader;
-	delete CourierNew;
+	delete Roboto;
 	delete _line;
 	delete _quad;
 }
@@ -55,7 +55,7 @@ void Renderer::initRenderData()
 
 void Renderer::initFontData()
 {
-	CourierNew = new Font("fonts/Roboto-Regular.ttf");
+	Roboto = new Font("fonts/Roboto-Regular.ttf");
 }
 
 void Renderer::DrawTex(Texture& texture, glm::vec2 position, glm::vec2 size, float rotate, glm::vec3 colour)
@@ -99,7 +99,7 @@ void Renderer::DrawString(std::string text, glm::vec2 position, float size, floa
 	std::string::const_iterator c;
 	for (c = text.begin(); c != text.end(); c++)
 	{
-		Character* cTex = CourierNew->getChar(*c);
+		Character* cTex = Roboto->getChar(*c);
 		if (cTex == nullptr)
 			continue;
 

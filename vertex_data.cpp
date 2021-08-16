@@ -1,5 +1,5 @@
 #include "vertex_data.h"
-#include <iostream>
+
 
 VertexData::VertexData(float* verticies, int length, int width)
 {

@@ -12,9 +12,6 @@ UIManager::UIManager(int width, int height)
 	topMenu->AddButton(btnNames.clearGraph);
 	topMenu->AddButton(btnNames.exit);
 
-	//option = new Options("t", "test options page, press enter to dismiss"
-	//	, width, height);
-
 	menus.push_back(topMenu);
 	menus.push_back(importMenu);
 }
